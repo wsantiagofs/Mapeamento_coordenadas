@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_0248b98471bed9df18c6ed3ca595c0e3 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_0248b98471bed9df18c6ed3ca595c0e3" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_0248b98471bed9df18c6ed3ca595c0e3 = L.map(
+                "map_0248b98471bed9df18c6ed3ca595c0e3",
+                {
+                    center: [-23.701325988324495, -46.59078625936423],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 10,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_e33a598faae17f485e65ff4de60f1804 = L.tileLayer(
+                "https://mt1.google.com/vt/lyrs=y\u0026x={x}\u0026y={y}\u0026z={z}",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "\u0026copy; Google",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_e33a598faae17f485e65ff4de60f1804.addTo(map_0248b98471bed9df18c6ed3ca595c0e3);
+        
+    
+            var feature_group_edd00a99f9cb167032d54190a2f34cdf = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_3b7916e58756bdcab6ed9e86f9838226 = L.marker(
+                [-23.701571982215, -46.590281998082],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_848c22af9a649a19b86bb87343b89e99 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_31cc29bdf560a61f46c31851bf53ba40 = $(`<div id="html_31cc29bdf560a61f46c31851bf53ba40" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 20, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_848c22af9a649a19b86bb87343b89e99.setContent(html_31cc29bdf560a61f46c31851bf53ba40);
+            
+        
+
+        marker_3b7916e58756bdcab6ed9e86f9838226.bindPopup(popup_848c22af9a649a19b86bb87343b89e99)
+        ;
+
+        
+    
+    
+            var marker_b3c275573a4b918af900f40fce1bf38c = L.marker(
+                [-23.701571982215, -46.590281998082],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_dc766f9d8a3354626c2161b0d15d5184 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_5809f6ae5de9cb6e3bb3d01bb03afe8c = $(`<div id="html_5809f6ae5de9cb6e3bb3d01bb03afe8c" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 20, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_dc766f9d8a3354626c2161b0d15d5184.setContent(html_5809f6ae5de9cb6e3bb3d01bb03afe8c);
+            
+        
+
+        marker_b3c275573a4b918af900f40fce1bf38c.bindPopup(popup_dc766f9d8a3354626c2161b0d15d5184)
+        ;
+
+        
+    
+    
+            var marker_8dbd00cca52f0fe6e8cff1dc25df29ea = L.marker(
+                [-23.701343994449, -46.590322985589],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_44f0199e00cfe97dd56e2c9e20864125 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_95c66173772d2a32fc195118fc47221a = $(`<div id="html_95c66173772d2a32fc195118fc47221a" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 31, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_44f0199e00cfe97dd56e2c9e20864125.setContent(html_95c66173772d2a32fc195118fc47221a);
+            
+        
+
+        marker_8dbd00cca52f0fe6e8cff1dc25df29ea.bindPopup(popup_44f0199e00cfe97dd56e2c9e20864125)
+        ;
+
+        
+    
+    
+            var marker_e2b6e74c40411a1a03ed2d9ff956fb3b = L.marker(
+                [-23.70151699693, -46.590332960054],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_5651e8f0ffb3a0e5c7f65eed17a72310 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ddb72b28a1ae933b4822d4c3bed38c24 = $(`<div id="html_ddb72b28a1ae933b4822d4c3bed38c24" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 30, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_5651e8f0ffb3a0e5c7f65eed17a72310.setContent(html_ddb72b28a1ae933b4822d4c3bed38c24);
+            
+        
+
+        marker_e2b6e74c40411a1a03ed2d9ff956fb3b.bindPopup(popup_5651e8f0ffb3a0e5c7f65eed17a72310)
+        ;
+
+        
+    
+    
+            var marker_87375d0f95d15e2952379d38dac2e2a9 = L.marker(
+                [-23.701571982215, -46.590281998082],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_65f44f4eaf593bc0241c4f724b7dcacd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_6aa4df9a8c5b678f6e8a7eae96cfb60e = $(`<div id="html_6aa4df9a8c5b678f6e8a7eae96cfb60e" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 20, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_65f44f4eaf593bc0241c4f724b7dcacd.setContent(html_6aa4df9a8c5b678f6e8a7eae96cfb60e);
+            
+        
+
+        marker_87375d0f95d15e2952379d38dac2e2a9.bindPopup(popup_65f44f4eaf593bc0241c4f724b7dcacd)
+        ;
+
+        
+    
+    
+            var marker_cc8e7045d556fb2647794afd7d4b0a4d = L.marker(
+                [-23.700262980396, -46.593804995806],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_6ffc012aa9129dccb8684eabc95a7aae = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b2b2a6de05f456e24b21f69e8329384e = $(`<div id="html_b2b2a6de05f456e24b21f69e8329384e" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 410, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_6ffc012aa9129dccb8684eabc95a7aae.setContent(html_b2b2a6de05f456e24b21f69e8329384e);
+            
+        
+
+        marker_cc8e7045d556fb2647794afd7d4b0a4d.bindPopup(popup_6ffc012aa9129dccb8684eabc95a7aae)
+        ;
+
+        
+    
+    
+            var marker_43f462746b5bda93a7793ffa5fe1b6ed = L.marker(
+                [-23.700265997881, -46.593873978869],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_4e11b03dca8c0243e31c20a8a5cb39fd = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f4571f9411fd546db52e85cb9d0807a1 = $(`<div id="html_f4571f9411fd546db52e85cb9d0807a1" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 416, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_4e11b03dca8c0243e31c20a8a5cb39fd.setContent(html_f4571f9411fd546db52e85cb9d0807a1);
+            
+        
+
+        marker_43f462746b5bda93a7793ffa5fe1b6ed.bindPopup(popup_4e11b03dca8c0243e31c20a8a5cb39fd)
+        ;
+
+        
+    
+    
+            var marker_efdcbe25f4dc1ba2feb8eac3f4c71efd = L.marker(
+                [-23.701493988606, -46.590260959505],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_f2204ecbfd5414031d1c6e535e6b57fe = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_2086e0ef557c533fc979534182097c3c = $(`<div id="html_2086e0ef557c533fc979534182097c3c" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 25, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_f2204ecbfd5414031d1c6e535e6b57fe.setContent(html_2086e0ef557c533fc979534182097c3c);
+            
+        
+
+        marker_efdcbe25f4dc1ba2feb8eac3f4c71efd.bindPopup(popup_f2204ecbfd5414031d1c6e535e6b57fe)
+        ;
+
+        
+    
+    
+            var marker_2c2bb7c7e8a588f47849e13786fe6d07 = L.marker(
+                [-23.701493988606, -46.590260959505],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_a3c8aaee0b9d621eb2291b5b7c332246 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_132af65ea3c62660743e4b125f707979 = $(`<div id="html_132af65ea3c62660743e4b125f707979" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 25, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_a3c8aaee0b9d621eb2291b5b7c332246.setContent(html_132af65ea3c62660743e4b125f707979);
+            
+        
+
+        marker_2c2bb7c7e8a588f47849e13786fe6d07.bindPopup(popup_a3c8aaee0b9d621eb2291b5b7c332246)
+        ;
+
+        
+    
+    
+            var marker_020f8ea87fc3f46e054d70cc55ffc972 = L.marker(
+                [-23.701493988606, -46.590260959505],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_f7ae738cff2d1effd331cc7f03b1ea26 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_47d5802ce8e28518df9e1c421aa61520 = $(`<div id="html_47d5802ce8e28518df9e1c421aa61520" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 25, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_f7ae738cff2d1effd331cc7f03b1ea26.setContent(html_47d5802ce8e28518df9e1c421aa61520);
+            
+        
+
+        marker_020f8ea87fc3f46e054d70cc55ffc972.bindPopup(popup_f7ae738cff2d1effd331cc7f03b1ea26)
+        ;
+
+        
+    
+    
+            var marker_c42ab97dfac31da81961841f52ae4dc9 = L.marker(
+                [-23.701493988606, -46.590260959505],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_446f2dbcd2ffdd0d5940a795e13cbdc4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c682118e61e55bd490a6b1874b8f8f31 = $(`<div id="html_c682118e61e55bd490a6b1874b8f8f31" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 25, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_446f2dbcd2ffdd0d5940a795e13cbdc4.setContent(html_c682118e61e55bd490a6b1874b8f8f31);
+            
+        
+
+        marker_c42ab97dfac31da81961841f52ae4dc9.bindPopup(popup_446f2dbcd2ffdd0d5940a795e13cbdc4)
+        ;
+
+        
+    
+    
+            var marker_5f0d65eea505fffe20cc4fa9c4953b88 = L.marker(
+                [-23.701493988606, -46.590260959505],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_bfb1fb4897389dbe4c437e22a17cd058 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3fccf87a9f1052888decbbc519e156d9 = $(`<div id="html_3fccf87a9f1052888decbbc519e156d9" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 25, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_bfb1fb4897389dbe4c437e22a17cd058.setContent(html_3fccf87a9f1052888decbbc519e156d9);
+            
+        
+
+        marker_5f0d65eea505fffe20cc4fa9c4953b88.bindPopup(popup_bfb1fb4897389dbe4c437e22a17cd058)
+        ;
+
+        
+    
+    
+            var marker_d88a13d74b03fb929974cc6fe3775e20 = L.marker(
+                [-23.701493988606, -46.590260959505],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_8f0fc2d42737e59dafb236278ae7291e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_02f9120e861f92993b4e69562f3b25a5 = $(`<div id="html_02f9120e861f92993b4e69562f3b25a5" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 25, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_8f0fc2d42737e59dafb236278ae7291e.setContent(html_02f9120e861f92993b4e69562f3b25a5);
+            
+        
+
+        marker_d88a13d74b03fb929974cc6fe3775e20.bindPopup(popup_8f0fc2d42737e59dafb236278ae7291e)
+        ;
+
+        
+    
+    
+            var marker_2e27acd71b42f2c837371011a2cab750 = L.marker(
+                [-23.701493988606, -46.590260959505],
+                {
+}
+            ).addTo(feature_group_edd00a99f9cb167032d54190a2f34cdf);
+        
+    
+        var popup_cab8e57410a78727ba7c20f820582a3f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_73f751e4cefd621c151d7c2479582d3c = $(`<div id="html_73f751e4cefd621c151d7c2479582d3c" style="width: 100.0%; height: 100.0%;"><b>RUA TOME DE SOUZA, 25, DIADEMA, SÃO PAULO, Brazil</b></div>`)[0];
+                popup_cab8e57410a78727ba7c20f820582a3f.setContent(html_73f751e4cefd621c151d7c2479582d3c);
+            
+        
+
+        marker_2e27acd71b42f2c837371011a2cab750.bindPopup(popup_cab8e57410a78727ba7c20f820582a3f)
+        ;
+
+        
+    
+    
+            feature_group_edd00a99f9cb167032d54190a2f34cdf.addTo(map_0248b98471bed9df18c6ed3ca595c0e3);
+        
+    
+            map_0248b98471bed9df18c6ed3ca595c0e3.fitBounds(
+                [[-23.701571982215, -46.593873978869], [-23.700262980396, -46.590260959505]],
+                {}
+            );
+        
+</script>
+</html>

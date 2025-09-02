@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geocodificador de Endereços Web</title>
+    
+    <!-- Tailwind CSS para o estilo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Biblioteca SheetJS para ler e escrever arquivos Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Biblioteca Leaflet para o mapa interativo -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Ícones Lucide -->
+    <script src="https://unpkg.com/lucide-react@0.292.0/dist/lucide-react.js"></script>
+
+    <style>
+        /* Estilo customizado para o corpo e para o container do mapa */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+        #map {
+            height: 500px;
+            border-radius: 0.5rem;
+            border: 1px solid #374151; /* border-gray-700 */
+            z-index: 10;
+        }
+        .leaflet-container {
+            background-color: #374151; /* Cor de fundo para o mapa enquanto carrega */
+        }
+    </style>
+</head>
+<body class="text-gray-200 p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto space-y-8">
+        
+        <!-- Cabeçalho -->
+        <header class="text-center">
+            <h1 class="text-4xl font-bold text-white mb-2">Geocodificador de Endereços</h1>
+            <p class="text-lg text-gray-400">Faça o upload de sua planilha Excel para encontrar as coordenadas e visualizar no mapa.</p>
+        </header>
+
+        <!-- Seção de Controle -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+                <!-- Passo 1: Baixar Modelo -->
+                <div class="flex flex-col items-center text-center">
+                    <div class="bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center text-white font-bold text-xl mb-3">1</div>
+                    <button id="download-template-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-all duration-300 w-full">
+                        Baixar Modelo
+                    </button>
+                    <p class="text-xs text-gray-500 mt-2">Comece por aqui se não tiver uma planilha.</p>
+                </div>
+
+                <!-- Passo 2: Upload -->
+                <div class="flex flex-col items-center text-center">
+                    <div class="bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center text-white font-bold text-xl mb-3">2</div>
+                    <label for="file-upload" class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition-all duration-300 w-full">
+                        <span id="file-label-text">Selecionar Planilha</span>
+                    </label>
+                    <input id="file-upload" type="file" class="hidden" accept=".xlsx, .xls">
+                    <p id="file-name" class="text-sm text-gray-400 mt-2 truncate w-full"></p>
+                </div>
+
+                <!-- Passo 3: Processar -->
+                <div class="flex flex-col items-center text-center">
+                    <div class="bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center text-white font-bold text-xl mb-3">3</div>
+                    <button id="process-btn" disabled class="bg-indigo-500 hover:bg-indigo-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-md transition-all duration-300 w-full">
+                        Buscar Coordenadas
+                    </button>
+                </div>
+
+                <!-- Passo 4: Download -->
+                <div class="flex flex-col items-center text-center">
+                    <div class="bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center text-white font-bold text-xl mb-3">4</div>
+                    <button id="download-btn" disabled class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-md transition-all duration-300 w-full">
+                        Baixar Resultados
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barra de Progresso e Status -->
+            <div id="status-container" class="hidden pt-4 text-center">
+                <p id="status-text" class="text-gray-300 mb-2"></p>
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-indigo-500 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Resultados -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Tabela de Resultados -->
+            <div class="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 lg:col-span-1">
+                <h2 class="text-2xl font-bold mb-4 text-white">Resultados</h2>
+                <div id="table-container" class="overflow-auto max-h-[500px] rounded-md">
+                    <table class="w-full min-w-[600px] text-sm text-left text-gray-300">
+                        <thead class="text-xs text-gray-200 uppercase bg-gray-700 sticky top-0">
+                            <tr id="table-header">
+                                <!-- Cabeçalhos serão inseridos aqui via JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Linhas da tabela serão inseridas aqui via JS -->
+                             <tr><td colspan="100%" class="text-center p-8 text-gray-500">Aguardando arquivo para processar...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mapa -->
+            <div class="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700 lg:col-span-1">
+                 <h2 class="text-2xl font-bold mb-4 text-white">Mapa de Endereços</h2>
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Referências aos elementos do DOM
+    const downloadTemplateBtn = document.getElementById('download-template-btn');
+    const fileUpload = document.getElementById('file-upload');
+    const fileNameDisplay = document.getElementById('file-name');
+    const fileLabelText = document.getElementById('file-label-text');
+    const processBtn = document.getElementById('process-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const statusContainer = document.getElementById('status-container');
+    const statusText = document.getElementById('status-text');
+    const progressBar = document.getElementById('progress-bar');
+    const tableHeader = document.getElementById('table-header');
+    const tableBody = document.getElementById('table-body');
+    
+    let workbookData = [];
+    let headers = [];
+    let map;
+
+    // Inicializa o mapa
+    function initMap() {
+        // Evita reinicializar o mapa se ele já existir
+        if(map) return;
+
+        map = L.map('map').setView([-23.5505, -46.6333], 10); // Centro em São Paulo
+        L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            attribution: '&copy; Google'
+        }).addTo(map);
+    }
+
+    // Função para baixar o modelo de planilha
+    downloadTemplateBtn.addEventListener('click', () => {
+        const templateHeaders = ['Endereço', 'Numero', 'Municipio', 'Estado'];
+        const templateData = [
+            templateHeaders,
+            ['RUA TOME DE SOUZA', '20', 'DIADEMA', 'SÃO PAULO'],
+            ['AVENIDA PAULISTA', '1578', 'SAO PAULO', 'SÃO PAULO'],
+            ['RUA PIRATININGA', '856', 'SANTOS', 'SÃO PAULO']
+        ];
+        
+        const ws = XLSX.utils.aoa_to_sheet(templateData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Modelo");
+        
+        // Ajusta a largura das colunas para melhor visualização
+        ws['!cols'] = [{ wch: 40 }, { wch: 10 }, { wch: 20 }, { wch: 20 }];
+
+        XLSX.writeFile(wb, "modelo_geocodificador.xlsx");
+    });
+    
+    // Função para tratar o upload do arquivo
+    fileUpload.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        fileNameDisplay.textContent = file.name;
+        fileLabelText.textContent = "Arquivo Carregado!";
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Converte a planilha para JSON, tratando o cabeçalho
+            workbookData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            if (workbookData.length > 0) {
+                headers = workbookData.shift(); // Remove e armazena o cabeçalho
+                processBtn.disabled = false;
+                
+                // Limpa e prepara a tabela
+                tableHeader.innerHTML = '';
+                tableBody.innerHTML = '<tr><td colspan="100%" class="text-center p-8 text-gray-500">Pronto para processar. Clique em "Buscar Coordenadas".</td></tr>';
+            } else {
+                 tableBody.innerHTML = '<tr><td colspan="100%" class="text-center p-8 text-gray-500">A planilha parece estar vazia.</td></tr>';
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    // Inicia o processo de geocodificação
+    processBtn.addEventListener('click', async () => {
+        if (workbookData.length === 0) {
+            alert("Nenhum dado para processar. Por favor, carregue uma planilha válida.");
+            return;
+        }
+
+        // Reseta a interface
+        processBtn.disabled = true;
+        downloadBtn.disabled = true;
+        statusContainer.style.display = 'block';
+        
+        // Configura a tabela
+        setupTable();
+        initMap();
+
+        let processedCount = 0;
+        const totalRows = workbookData.length;
+        
+        // Loop com delay para não sobrecarregar a API
+        for (let i = 0; i < totalRows; i++) {
+            await processRow(i, totalRows);
+            processedCount++;
+            const progress = (processedCount / totalRows) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        statusText.textContent = "Processo finalizado com sucesso!";
+        downloadBtn.disabled = false;
+        createMapMarkers();
+    });
+    
+    // Configura o cabeçalho e as linhas vazias da tabela
+    function setupTable() {
+        // Adiciona as novas colunas aos cabeçalhos
+        const newHeaders = [...headers, 'Endereço Buscado', 'Latitude', 'Longitude'];
+        tableHeader.innerHTML = newHeaders.map(h => `<th scope="col" class="px-6 py-3">${h}</th>`).join('');
+
+        tableBody.innerHTML = '';
+        workbookData.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.id = `row-${index}`;
+            tr.className = "bg-gray-800 border-b border-gray-700";
+            
+            // Adiciona células para os dados originais
+            let cellsHTML = row.map(cell => `<td class="px-6 py-4">${cell || ''}</td>`).join('');
+            
+            // Adiciona células para os novos dados (com placeholders)
+            cellsHTML += `
+                <td class="px-6 py-4" id="address-${index}">...</td>
+                <td class="px-6 py-4" id="lat-${index}">...</td>
+                <td class="px-6 py-4" id="lon-${index}">...</td>
+            `;
+            tr.innerHTML = cellsHTML;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    // Processa uma única linha da planilha
+    async function processRow(index, total) {
+        statusText.textContent = `Processando linha ${index + 1} de ${total}...`;
+        const rowData = workbookData[index];
+        
+        // Mapeia os dados da linha para um objeto usando os cabeçalhos
+        const rowObject = headers.reduce((obj, header, i) => {
+            obj[header] = rowData[i];
+            return obj;
+        }, {});
+        
+        // Lê as colunas pelo nome para maior flexibilidade
+        const rua = rowObject['Endereço'] || '';
+        const numero = rowObject['Numero'] || '';
+        const municipio = rowObject['Municipio'] || '';
+        const estado = rowObject['Estado'] || '';
+
+        if (!rua || !municipio || !estado) {
+            updateRowResults(index, 'Dados insuficientes (Endereço, Município, Estado)', 'Inválido', 'Inválido');
+            return;
+        }
+
+        // Concatena o endereço com o número, se o número existir
+        const addressWithNumber = numero ? `${rua}, ${numero}` : rua;
+        const fullAddress = `${addressWithNumber}, ${municipio}, ${estado}, Brazil`;
+        
+        try {
+            const apiUrl = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${encodeURIComponent(fullAddress)}&outFields=Addr_type&f=json`;
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates.length > 0) {
+                const bestMatch = data.candidates[0];
+                const coords = bestMatch.location;
+
+                updateRowResults(index, fullAddress, coords.y.toFixed(6), coords.x.toFixed(6));
+                
+                // Adiciona os resultados ao objeto de dados para download
+                workbookData[index][headers.length] = fullAddress;
+                workbookData[index][headers.length + 1] = coords.y.toFixed(6);
+                workbookData[index][headers.length + 2] = coords.x.toFixed(6);
+
+            } else {
+                 throw new Error('Nenhum candidato a endereço encontrado.');
+            }
+        } catch (error) {
+            console.error(`Erro ao buscar endereço para a linha ${index}:`, error);
+            updateRowResults(index, fullAddress, 'Não encontrado', 'Não encontrado');
+            workbookData[index][headers.length] = fullAddress;
+            workbookData[index][headers.length + 1] = 'Não encontrado';
+            workbookData[index][headers.length + 2] = 'Não encontrado';
+        }
+
+        // Pequena pausa para não exceder limites da API
+        return new Promise(resolve => setTimeout(resolve, 300));
+    }
+    
+    // Atualiza as células de resultado na tabela
+    function updateRowResults(index, address, lat, lon) {
+        document.getElementById(`address-${index}`).textContent = address;
+        document.getElementById(`lat-${index}`).textContent = lat;
+        document.getElementById(`lon-${index}`).textContent = lon;
+    }
+
+    // Cria os marcadores no mapa após o processamento
+    let markerGroup = null;
+    function createMapMarkers() {
+        if(markerGroup){
+           map.removeLayer(markerGroup);
+        }
+        markerGroup = L.featureGroup().addTo(map);
+
+        const latIndex = headers.length + 1;
+        const lonIndex = headers.length + 2;
+
+        workbookData.forEach((row, i) => {
+            const lat = parseFloat(row[latIndex]);
+            const lon = parseFloat(row[lonIndex]);
+            
+            if (!isNaN(lat) && !isNaN(lon)) {
+                const marker = L.marker([lat, lon]);
+                const popupContent = `<b>Endereço:</b> ${row[headers.length]}`;
+                marker.bindPopup(popupContent);
+                markerGroup.addLayer(marker);
+            }
+        });
+        
+        // Ajusta o zoom para enquadrar todos os marcadores
+        if(markerGroup.getLayers().length > 0){
+             map.fitBounds(markerGroup.getBounds().pad(0.1));
+        }
+    }
+    
+    // Função para baixar os resultados em Excel
+    downloadBtn.addEventListener('click', () => {
+        const finalHeaders = [...headers, 'Endereço Buscado', 'Latitude', 'Longitude'];
+        const dataToExport = [finalHeaders, ...workbookData];
+        
+        const ws = XLSX.utils.aoa_to_sheet(dataToExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Resultados");
+        XLSX.writeFile(wb, "resultado_coordenadas.xlsx");
+    });
+    
+    // Inicializa o mapa ao carregar a página
+    document.addEventListener('DOMContentLoaded', initMap);
+
+</script>
+
+</body>
+</html>
+

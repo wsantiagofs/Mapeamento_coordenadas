@@ -1,92 +1,113 @@
 import pandas as pd
 import geopandas
 from shapely.geometry import Point
-import json # Necessário se o seu geojson_file ainda for gerado ou lido como string
+import folium
 
 # --- 1. Definir os caminhos dos arquivos ---
 excel_file = 'teste2.xlsx'  # Nome do seu arquivo Excel
-geojson_file = 'MunicipioGuaruja.geojson' # Nome do seu arquivo GeoJSON (verifique o nome real do seu arquivo!)
+geojson_file = 'MunicipioGuaruja.geojson' # Nome do seu arquivo GeoJSON
 
 # --- 4. Leitura dos dados do Excel ---
 try:
     df_dados = pd.read_excel(excel_file)
-    print("\nDados do Excel lidos com sucesso (nomes originais das colunas):")
-    print(df_dados.head())
-    print("Nomes originais das colunas lidas:", df_dados.columns.tolist())
-
-    # --- NOVO BLOCO: RENOMEAR COLUNAS PELO ÍNDICE ---
-    # Mapeamento dos índices para os novos nomes das colunas
-    # CERTIFIQUE-SE QUE ESSES ÍNDICES (0, 3, 8, 9) CORRESPONDEM EXATAMENTE ÀS COLUNAS
-    # MATRICULA, COMUNIDADE, Latitude e Longitude NO SEU ARQUIVO EXCEL.
-    # Se suas colunas de Latitude/Longitude mudarem de posição ou forem outras, ajuste os índices.
+    # ... (código para renomear colunas - mantenha o código existente)
     col_mapping = {
-        df_dados.columns[0]: 'MATRICULA_PADRONIZADA', # Coluna A (índice 0)
-        df_dados.columns[3]: 'COMUNIDADE_PADRONIZADA', # Coluna D (índice 3)
-        df_dados.columns[8]: 'Latitude_PADRONIZADA',  # Coluna I (índice 8)
-        df_dados.columns[9]: 'Longitude_PADRONIZADA' # Coluna J (índice 9)
+        df_dados.columns[0]: 'MATRICULA_PADRONIZADA',
+        df_dados.columns[3]: 'COMUNIDADE_PADRONIZADA',
+        df_dados.columns[8]: 'Latitude_PADRONIZADA',
+        df_dados.columns[9]: 'Longitude_PADRONIZADA'
     }
-
-    # Renomear as colunas no DataFrame
     df_dados.rename(columns=col_mapping, inplace=True)
-    print("\nColunas após renomeio por índice para padronização:")
-    print(df_dados.columns.tolist())
 
-except FileNotFoundError:
-    print(f"Erro: Arquivo Excel '{excel_file}' não encontrado. Verifique o caminho e o nome do arquivo.")
-    exit()
+    # --- TRATAMENTO DAS COLUNAS DE LATITUDE E LONGITUDE ---
+    # Passo 1: Garantir que são strings e substituir vírgulas por pontos
+    df_dados['Latitude_PADRONIZADA'] = df_dados['Latitude_PADRONIZADA'].astype(str).str.replace(',', '.', regex=False)
+    df_dados['Longitude_PADRONIZADA'] = df_dados['Longitude_PADRONIZADA'].astype(str).str.replace(',', '.', regex=False)
 
-# --- TRATAMENTO DAS COLUNAS DE LATITUDE E LONGITUDE (usando os nomes padronizados) ---
-# Substituir vírgula por ponto e converter para float
-df_dados['Latitude_PADRONIZADA'] = df_dados['Latitude_PADRONIZADA'].astype(str).str.replace(',', '.', regex=False).astype(float)
-df_dados['Longitude_PADRONIZADA'] = df_dados['Longitude_PADRONIZADA'].astype(str).str.replace(',', '.', regex=False).astype(float)
+    # Passo 2: Converter para numérico. Qualquer valor que não possa ser convertido vira NaN.
+    df_dados['Latitude_PADRONIZADA'] = pd.to_numeric(df_dados['Latitude_PADRONIZADA'], errors='coerce')
+    df_dados['Longitude_PADRONIZADA'] = pd.to_numeric(df_dados['Longitude_PADRONIZADA'], errors='coerce')
 
-print("\nDados do Excel após tratamento e conversão para float:")
-print(df_dados.head())
-print(df_dados.info())
+    print("\nDados do Excel após tratamento e conversão para float:")
+    print(df_dados.head())
+    print(df_dados.info()) # Verifique os dtypes e contagem de non-null aqui para ver os NaNs
 
-# --- 5. Criação do GeoDataFrame a partir dos pontos do Excel (usando os nomes padronizados) ---
-geometry = [Point(xy) for xy in zip(df_dados['Longitude_PADRONIZADA'], df_dados['Latitude_PADRONIZADA'])]
-gdf_pontos = geopandas.GeoDataFrame(df_dados, geometry=geometry, crs="EPSG:4326")
+    # --- REMOVER LINHAS COM NaN NAS COORDENADAS ---
+    # Esta linha vai agora remover os NaNs que foram gerados pelo errors='coerce'
+    df_dados_validos = df_dados.dropna(subset=['Latitude_PADRONIZADA', 'Longitude_PADRONIZADA'])
+    print(f"\nRemovidas {len(df_dados) - len(df_dados_validos)} linhas com coordenadas ausentes/inválidas.")
+    print(f"Total de linhas válidas para mapeamento (após remover NaNs): {len(df_dados_validos)}")
 
-print("\nGeoDataFrame de pontos criado:")
-print(gdf_pontos.head())
 
-# --- 6. Leitura do arquivo GeoJSON (área de atuação) ---
-try:
+    # --- 5. Criação do GeoDataFrame a partir dos pontos válidos (sem NaN) ---
+    geometry = [Point(xy) for xy in zip(df_dados_validos['Longitude_PADRONIZADA'], df_dados_validos['Latitude_PADRONIZADA'])]
+    gdf_pontos = geopandas.GeoDataFrame(df_dados_validos, geometry=geometry, crs="EPSG:4326")
+
+    # ... (restante do seu código para ler GeoJSON, comparar e gerar mapa)
+    # 6. Leitura do arquivo GeoJSON (área de atuação)
     gdf_area_guaruja = geopandas.read_file(geojson_file)
-    # Garante que o CRS (Sistema de Referência de Coordenadas) seja o mesmo para comparação
     gdf_area_guaruja = gdf_area_guaruja.to_crs("EPSG:4326")
     print("\nGeoJSON da área de atuação do Guarujá lido com sucesso:")
     print(gdf_area_guaruja)
-except FileNotFoundError:
-    print(f"Erro: Arquivo GeoJSON '{geojson_file}' não encontrado. Verifique o caminho e o nome do arquivo.")
-    exit()
+
+    # 7. Comparação Espacial: Verificar se os pontos estão dentro da área do Guarujá
+    area_guaruja_polygon = gdf_area_guaruja.geometry.unary_union
+    gdf_pontos['Dentro_Area_Guaruja'] = gdf_pontos.geometry.apply(lambda point: point.within(area_guaruja_polygon))
+
+    # NOVO BLOCO: Filtrar apenas os pontos que estão DENTRO da bacia delimitada
+    gdf_pontos_filtrados = gdf_pontos[gdf_pontos['Dentro_Area_Guaruja'] == True].copy()
+    print(f"\nTotal de pontos que estão DENTRO da bacia delimitada (e sem NaNs): {len(gdf_pontos_filtrados)}")
+    print("Detalhes dos pontos dentro da bacia:")
+    print(gdf_pontos_filtrados[['MATRICULA_PADRONIZADA', 'COMUNIDADE_PADRONIZADA', 'Latitude_PADRONIZADA', 'Longitude_PADRONIZADA', 'Dentro_Area_Guaruja']].head())
+
+    # 8. Criação do mapa com Folium (apenas com pontos DENTRO da bacia)
+    if not gdf_pontos_filtrados.empty:
+        m = folium.Map(location=[-23.98, -46.28], zoom_start=12)
+
+        # Adicionar os polígonos da área do Guarujá ao mapa (opcional, mas bom para contexto)
+        folium.GeoJson(
+            gdf_area_guaruja.to_json(),
+            name='Área de Atuação Guarujá',
+            style_function=lambda x: {
+                'fillColor': '#0000ff', # Azul
+                'color': 'black',
+                'weight': 2,
+                'fillOpacity': 0.1
+            }
+        ).add_to(m)
+
+        # Adicionar os pontos ao mapa (apenas os filtrados)
+        for idx, row in gdf_pontos_filtrados.iterrows():
+            color = 'green' # Cor para pontos validados e dentro da área
+
+            matricula_str = str(row.get('MATRICULA_PADRONIZADA', 'N/A'))
+            comunidade_str = str(row.get('COMUNIDADE_PADRONIZADA', 'N/A'))
+
+            folium.CircleMarker(
+                location=[row['Latitude_PADRONIZADA'], row['Longitude_PADRONIZADA']],
+                radius=5,
+                color=color,
+                fill=True,
+                fill_color=color,
+                tooltip=f"Matrícula: {matricula_str}<br>Comunidade: {comunidade_str}"
+            ).add_to(m)
+
+        # Adicionar controle de camadas (opcional)
+        folium.LayerControl().add_to(m)
+
+        # Salvar o mapa em um arquivo HTML
+        m.save("mapa_guaruja_pontos_validos.html")
+        print("Mapa interativo com APENAS pontos válidos (sem NaNs e dentro da bacia) criado em 'mapa_guaruja_pontos_validos.html'")
+    else:
+        print("Nenhum ponto válido encontrado para plotar no mapa após a limpeza de dados e filtragem por bacia.")
+
+    # Próximo passo: Salvar os dados CORRIGIDOS E FILTRADOS
+    gdf_pontos_filtrados.to_excel('seus_dados_validos_na_bacia.xlsx', index=False)
+    print("\nDados com a coluna 'Dentro_Area_Guaruja' e filtrados (apenas válidos na bacia) salvos em 'seus_dados_validos_na_bacia.xlsx'.")
+
+except FileNotFoundError as e:
+    print(f"Erro: Arquivo não encontrado: {e}. Verifique se os arquivos Excel e GeoJSON existem e o caminho está correto.")
 except Exception as e:
-    print(f"Erro ao ler o arquivo GeoJSON '{geojson_file}': {e}")
-    print("Verifique se o arquivo GeoJSON está bem formatado e não está corrompido.")
-    exit()
-
-# --- 7. Comparação Espacial: Verificar se os pontos estão dentro da área do Guarujá ---
-# Combina todas as geometrias em uma única (se o GeoJSON tiver mais de um polígono)
-area_guaruja_polygon = gdf_area_guaruja.geometry.unary_union
-
-# Adiciona uma nova coluna ao GeoDataFrame de pontos indicando se está dentro da área
-gdf_pontos['Dentro_Area_Guaruja'] = gdf_pontos.geometry.apply(lambda point: point.within(area_guaruja_polygon))
-
-print("\nResultados da comparação espacial:")
-# Usar os novos nomes padronizados no print
-print(gdf_pontos[['MATRICULA_PADRONIZADA', 'COMUNIDADE_PADRONIZADA', 'Latitude_PADRONIZADA', 'Longitude_PADRONIZADA', 'Dentro_Area_Guaruja']])
-
-# --- Opcional: Filtrar pontos que estão fora da área ---
-pontos_fora = gdf_pontos[gdf_pontos['Dentro_Area_Guaruja'] == False]
-if not pontos_fora.empty:
-    print("\nPontos encontrados FORA da área de atuação do Guarujá:")
-    print(pontos_fora[['MATRICULA_PADRONIZADA', 'COMUNIDADE_PADRONIZADA', 'Latitude_PADRONIZADA', 'Longitude_PADRONIZADA']])
-else:
-    print("\nTodos os pontos estão dentro da área de atuação do Guarujá.")
-
-# --- Próximo passo: Salvar os dados corrigidos ou marcados ---
-# Você pode salvar este GeoDataFrame de volta para um CSV ou Excel,
-# incluindo a nova coluna 'Dentro_Area_Guaruja'.
-gdf_pontos.to_excel('seus_dados_verificados.xlsx', index=False)
-print("\nDados com a coluna 'Dentro_Area_Guaruja' salvos em 'seus_dados_verificados.xlsx'.")
+    print(f"Ocorreu um erro inesperado: {e}")
+    import traceback
+    traceback.print_exc() # Isso imprimirá o traceback completo para depuração
